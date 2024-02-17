@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,9 +29,18 @@ class TodoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        //
+      //入力された値（title）にバリデーションをあてる。
+      $validated = $request->validate([
+        'title' => 'required|string|max:255',
+      ]);
+
+      //$requestで受け取った値をデータベースに保存する
+      $request->user()->todos()->create($validated);
+      
+      //返り値の型はRedirectResponseで、todo.indexに帰る。
+      return redirect(route('todo.index'));
     }
 
     /**
